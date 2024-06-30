@@ -1,2 +1,7 @@
 # TechTrends
- Full Stack Web App for Tracking Your Jobs
+
+A MERN Stack Web App to Track Tech Jobs!
+
+---
+
+## [Design Document] ()
