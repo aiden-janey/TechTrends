@@ -1,7 +1,7 @@
 const express = require("express");
 const { ObjectId } = require("mongodb");
 let router = express.Router();
-let { User } = require("../models/user.js");
+let User = require("../models/user.js");
 
 //Get All Users
 router.get("/", (req, res) => {
@@ -33,19 +33,21 @@ router.get("/:id", (req, res) => {
 });
 
 //Create A User
-router.post("/", (req, res) => {
-  let u = new User({
-    username: req.body["username"],
-    password: req.body["password"],
-    email: req.body["email"],
-  });
+router.post("/", async (req, res) => {
+  const { username, password, email } = req.body;
 
-  u.save()
+  console.log(req.body);
+
+  let u = new User({ username, password, email });
+
+  await u
+    .save()
     .then((doc) => {
       res.send(doc);
+      console.log(`Hello ${doc.body.JSON}`);
     })
     .catch((err) => {
-      console.log(`Error in User Save: ${JSON.stringify(err, undefined, 2)}`);
+      console.log(`Error in User Save: ${err}`);
     });
 });
 
