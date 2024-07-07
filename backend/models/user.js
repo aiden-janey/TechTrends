@@ -3,17 +3,17 @@ const mongoose = require("mongoose");
 const schema = new mongoose.Schema({
   username: {
     type: String,
-    required: false,
+    required: true,
   },
   password: {
     type: String,
-    required: false,
+    required: true,
   },
   email: {
     type: String,
-    required: false,
+    required: true,
   },
-  /*currSalary: {
+  currSalary: {
     type: [String],
     required: false,
   },
@@ -28,7 +28,7 @@ const schema = new mongoose.Schema({
   currCity: {
     type: [String],
     required: false,
-  },*/
+  },
 });
 
 const User = mongoose.model("User", schema);
