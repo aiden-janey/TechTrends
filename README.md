@@ -1,18 +1,21 @@
 # TechTrends
 ![TechTrends](https://github.com/aiden-janey/aiden-janey.github.io/blob/main/Tech%20(1).png)
 
-A MERN Stack Web App to Track Tech Jobs!
-
----
-
-## Design Document
-
-[Here](https://docs.google.com/document/d/1ChgooUAmopHw-O4oeJ72FXvu-dZCxZNdnHbaSiHt9Go/edit?usp=sharing) is a design document for the TechTrends app. It shows how the app was conceptualized and the technologies involved in development.
+TechTrends is a full-stack web application where the user can upload information from tech job postings in their area and visualize the data. TechTrends provides valuable job market insights for anyone who wants to break into the industry. Some examples of information users can access are most common technologies by city, what are most users positions & salaries and more.
 
 **Note**
-This is a living document and the contents will change as the scope of the project changes.
+Please note that the following will be treated as a living document. It will be modified as the scope, development and life of this app changes
 
----
+## Technologies
+
+- React (JS library for building the UI)
+- BootStrap (CSS library for designing the UI)
+- jQuery (JS library to simplify working with the V-DOM)
+- Chart.js (JS library for visualize data in graphs)
+- Node.js (JS runtime environment)
+- Express.js (JS backend framework for building APIs)
+- MongoDB (Document-oriented database)
+- Docker (Container App Deployment)
 
 ## Download
 
@@ -21,10 +24,8 @@ You can download a containerized version of the app from DockerHub [here](https:
 **Note**
 Since the app is currently in development, it is not available for download.
 
----
+## ER Diagram
 
-## Development Updates
+## Use Case Narratives
 
-Periodically I'll list below what I'm currently working on:
-
-- API requests for Users (Account creation, updates, deletion, etc.)
+## Wireframes
