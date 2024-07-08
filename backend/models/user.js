@@ -14,7 +14,7 @@ const schema = new mongoose.Schema({
     required: true,
   },
   currSalary: {
-    type: [String],
+    type: [Number],
     required: false,
   },
   currJob: {

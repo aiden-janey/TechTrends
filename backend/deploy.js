@@ -15,7 +15,9 @@ mongoose
   );
 
 const userController = require("./controllers/userController.js");
+const jobController = require("./controllers/jobController.js");
 
 app.use("/users", userController);
+app.use("/jobs", jobController);
 
 app.listen(8080, () => console.log("Server Started on Port 8080"));
