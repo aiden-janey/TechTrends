@@ -1,19 +1,37 @@
-const express = require("express");
-const { ObjectId } = require("mongodb");
-let router = express.Router();
-let { SWE } = require("../models/jobs/swe.js");
+import { Router } from "express";
+const router = Router();
+import { SWE } from "../models/jobs/swe.js";
+import { DA } from "../models/jobs/da.js";
+import { DS } from "../models/jobs/ds.js";
 
 //Get All Jobs
-router.get("/", (req, res) => {
-  SWE.find({})
+router.get("/", async (req, res) => {
+  let jobs = [];
+  await SWE.find({})
     .then((docs) => {
-      res.send(docs);
+      jobs.push(docs);
     })
     .catch((err) => {
-      console.log(
-        `Error in Retrieving Users: ${JSON.stringify(err, undefined, 2)}`
-      );
+      console.log(`Error in Retrieving SWE Jobs: ${err}`);
     });
+
+  await DA.find({})
+    .then((docs) => {
+      jobs.push(docs);
+    })
+    .catch((err) => {
+      console.log(`Error in Retrieving DA Jobs: ${err}`);
+    });
+
+  await DS.find({})
+    .then((docs) => {
+      jobs.push(docs);
+    })
+    .catch((err) => {
+      console.log(`Error in Retrieving DS Jobs: ${err}`);
+    });
+
+  res.send(jobs);
 });
 
 //Create A Job
@@ -39,6 +57,43 @@ router.post("/:id/:position", async (req, res) => {
         link: req.body.link,
       });
       break;
+    case "da":
+      job = new DA({
+        userId: req.params.id,
+        position: req.params.position,
+        attendance: req.body.attendance,
+        level: req.body.level,
+        education: req.body.education,
+        experience: req.body.experience,
+        software: req.body.software,
+        languages: req.body.languages,
+        databases: req.body.databases,
+        company: req.body.company,
+        site: req.body.site,
+        address: req.body.address,
+        city: req.body.city,
+        link: req.body.link,
+      });
+      break;
+    case "ds":
+      job = new DS({
+        userId: req.params.id,
+        position: req.params.position,
+        attendance: req.body.attendance,
+        level: req.body.level,
+        education: req.body.education,
+        experience: req.body.experience,
+        software: req.body.software,
+        languages: req.body.languages,
+        libraries: req.body.libraries,
+        company: req.body.company,
+        databases: req.body.databases,
+        site: req.body.site,
+        address: req.body.address,
+        city: req.body.city,
+        link: req.body.link,
+      });
+      break;
   }
 
   await job
@@ -51,4 +106,4 @@ router.post("/:id/:position", async (req, res) => {
     });
 });
 
-module.exports = router;
+export default router;

@@ -1,4 +1,4 @@
-//Schema Definition for Software Engineer
+//Schema Definition for Data Scientist
 import { Schema, model } from "mongoose";
 import { ObjectId } from "mongodb";
 
@@ -27,15 +27,19 @@ const schema = new Schema({
     type: Number,
     required: true,
   },
-  tools: {
+  software: {
+    type: [String],
+    required: false,
+  },
+  libaries: {
+    type: [String],
+    required: false,
+  },
+  databases: {
     type: [String],
     required: false,
   },
   languages: {
-    type: [String],
-    required: false,
-  },
-  frameworks: {
     type: [String],
     required: false,
   },
@@ -61,6 +65,6 @@ const schema = new Schema({
   },
 });
 
-const SWE = model("SWE", schema);
+const DS = model("DS", schema);
 
-export default { SWE };
+export default { DS };
