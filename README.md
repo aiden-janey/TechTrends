@@ -1,4 +1,5 @@
 # TechTrends
+![TechTrends](https://github.com/aiden-janey/aiden-janey.github.io/blob/main/Tech%20(1).png)
 
 A MERN Stack Web App to Track Tech Jobs!
 
