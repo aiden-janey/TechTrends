@@ -1,8 +1,8 @@
 //Schema Definition for Data Analyst
-import { Schema, model } from "mongoose";
-import { ObjectId } from "mongodb";
+const mongoose = require("mongoose");
+const { ObjectId } = require("mongodb");
 
-const schema = new Schema({
+const schema = new mongoose.Schema({
   userId: {
     type: ObjectId,
     required: true,
@@ -61,6 +61,6 @@ const schema = new Schema({
   },
 });
 
-const DA = model("DA", schema);
+const DA = mongoose.model("DA", schema, "jobs");
 
-export default { DA };
+module.exports = { DA };

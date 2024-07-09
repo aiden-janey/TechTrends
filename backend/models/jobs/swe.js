@@ -1,8 +1,8 @@
 //Schema Definition for Software Engineer
-import { Schema, model } from "mongoose";
-import { ObjectId } from "mongodb";
+const mongoose = require("mongoose");
+const { ObjectId } = require("mongodb");
 
-const schema = new Schema({
+const schema = {
   userId: {
     type: ObjectId,
     required: true,
@@ -59,8 +59,8 @@ const schema = new Schema({
     type: String,
     required: true,
   },
-});
+};
 
-const SWE = model("SWE", schema);
+const SWE = mongoose.model("SWE", schema, "jobs");
 
-export default { SWE };
+module.exports = { SWE };

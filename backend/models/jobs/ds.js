@@ -1,8 +1,8 @@
 //Schema Definition for Data Scientist
-import { Schema, model } from "mongoose";
-import { ObjectId } from "mongodb";
+const mongoose = require("mongoose");
+const { ObjectId } = require("mongodb");
 
-const schema = new Schema({
+const schema = new mongoose.Schema({
   userId: {
     type: ObjectId,
     required: true,
@@ -65,6 +65,6 @@ const schema = new Schema({
   },
 });
 
-const DS = model("DS", schema);
+const DS = mongoose.model("DS", schema, "jobs");
 
-export default { DS };
+module.exports = { DS };
