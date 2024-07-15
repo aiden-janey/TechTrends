@@ -1,8 +1,6 @@
 const express = require("express");
-const { ObjectId } = require("mongodb");
 let router = express.Router();
-let { Job } = require("../models/jobs/job.js");
-const mongoose = require("mongoose");
+let { Job } = require("../models/job.js");
 let { Parser } = require("../utils/parser.js");
 
 //Get All Jobs

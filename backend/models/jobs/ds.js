@@ -63,6 +63,10 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  date: {
+    type: Date,
+    required: true,
+  },
 });
 
 const DS = mongoose.model("DS", schema, "jobs");

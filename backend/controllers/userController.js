@@ -86,7 +86,7 @@ router.put("/:id/salary", async (req, res) => {
 
   await User.findByIdAndUpdate(req.params.id, req.body)
     .then((doc) => {
-      doc.currSalary.push(req.body.currSalary);
+      doc.salaries.push(req.body.currSalary);
       res.send(doc);
     })
     .catch((err) => {
@@ -101,7 +101,7 @@ router.put("/:id/job", async (req, res) => {
 
   await User.findByIdAndUpdate(req.params.id, req.body)
     .then((doc) => {
-      doc.currJob.push(req.body.currJob);
+      doc.jobs.push(req.body.currJob);
       res.send(doc);
     })
     .catch((err) => {
@@ -116,7 +116,7 @@ router.put("/:id/level", async (req, res) => {
 
   await User.findByIdAndUpdate(req.params.id, req.body)
     .then((doc) => {
-      doc.currLvl.push(req.body.currLvl);
+      doc.levels.push(req.body.currLvl);
       res.send(doc);
     })
     .catch((err) => {
@@ -131,7 +131,7 @@ router.put("/:id/city", async (req, res) => {
 
   await User.findByIdAndUpdate(req.params.id, req.body)
     .then((doc) => {
-      doc.currCity.push(req.body.currCity);
+      doc.city = req.body.city;
       res.send(doc);
     })
     .catch((err) => {

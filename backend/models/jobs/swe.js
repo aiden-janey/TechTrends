@@ -59,6 +59,10 @@ const schema = {
     type: String,
     required: true,
   },
+  date: {
+    type: Date,
+    required: true,
+  },
 };
 
 const SWE = mongoose.model("SWE", schema, "jobs");

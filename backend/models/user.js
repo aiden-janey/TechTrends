@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { ObjectId } = require("mongodb");
 
 const schema = new mongoose.Schema({
   username: {
@@ -14,20 +13,24 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  currSalary: {
+  salaries: {
     type: [Number],
     required: false,
   },
-  currJob: {
+  jobs: {
     type: [String],
     required: false,
   },
-  currLvl: {
+  levels: {
     type: [String],
     required: false,
   },
-  currCity: {
-    type: [String],
+  city: {
+    type: String,
+    required: false,
+  },
+  age: {
+    type: Number,
     required: false,
   },
 });
