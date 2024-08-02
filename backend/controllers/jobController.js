@@ -29,4 +29,9 @@ router.post("/:id/:position", async (req, res) => {
     });
 });
 
+//Get Total Count of Languages
+router.get("/languages", async (req, res) => {
+  await Job.find({ languages });
+});
+
 module.exports = router;
