@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const userController = require("./controllers/userController.js");
 const jobController = require("./controllers/jobController.js");
 const app = express();
+//app.use(cors());
 app.use(bodyParser.json());
 
 mongoose

@@ -1,8 +1,8 @@
-//Schema Definition for Data Scientist
+//Schema Definition for Job
 const mongoose = require("mongoose");
 const { ObjectId } = require("mongodb");
 
-const schema = new mongoose.Schema({
+const schema = {
   userId: {
     type: ObjectId,
     required: true,
@@ -27,6 +27,18 @@ const schema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  tools: {
+    type: [String],
+    required: false,
+  },
+  languages: {
+    type: [String],
+    required: false,
+  },
+  frameworks: {
+    type: [String],
+    required: false,
+  },
   software: {
     type: [String],
     required: false,
@@ -36,10 +48,6 @@ const schema = new mongoose.Schema({
     required: false,
   },
   databases: {
-    type: [String],
-    required: false,
-  },
-  languages: {
     type: [String],
     required: false,
   },
@@ -67,8 +75,8 @@ const schema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+};
 
-const DS = mongoose.model("DS", schema, "jobs");
+const Job = mongoose.model("Job", schema, "jobs");
 
-module.exports = { DS };
+module.exports = { Job };

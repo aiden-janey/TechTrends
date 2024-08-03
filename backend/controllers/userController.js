@@ -1,7 +1,7 @@
 const express = require("express");
 const { ObjectId } = require("mongodb");
 const router = express.Router();
-const User = require("../models/user.js");
+const User = require("../models/user.model.js");
 const ev = require("email-validator");
 const Validation = require("../utils/validation.js");
 const { createHmac } = require("node:crypto");
