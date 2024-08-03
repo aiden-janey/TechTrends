@@ -8,6 +8,7 @@ import Jobs from "./pages/Jobs";
 import Technologies from "./pages/Technologies";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Login from "./pages/Login";
 
 export default class App extends Component {
   render() {
@@ -22,6 +23,7 @@ export default class App extends Component {
             <Route path="/about" exact Component={About} />
             <Route path="/contact" exact Component={Contact} />
             <Route path="*" exact Component={ErrorPage} />
+            <Route path="/login" exact Component={Login} />
           </Routes>
         </div>
       </BrowserRouter>
