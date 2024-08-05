@@ -1,11 +1,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const userController = require("./controllers/userController.js");
 const jobController = require("./controllers/jobController.js");
 const app = express();
-//app.use(cors());
-app.use(bodyParser.json());
 
 mongoose
   .connect("mongodb://localhost:27017/techtrends")
@@ -15,6 +14,9 @@ mongoose
   .catch((err) =>
     console.log(`Error in DB Connection: ${JSON.stringify(err, undefined, 2)}`)
   );
+
+app.use(cors());
+app.use(express.json());
 
 app.use("/users", userController);
 app.use("/jobs", jobController);
