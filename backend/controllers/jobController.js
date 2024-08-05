@@ -14,16 +14,15 @@ router.get("/", async (req, res) => {
 });
 
 //Create A Job
-router.post("/:id/:position", async (req, res) => {
+router.post("/:id/insert", async (req, res) => {
   let job = new Job({
     userId: req.params.id,
-    position: req.params.position,
+    position: req.body.position,
     attendance: req.body.attendance,
     level: req.body.level,
     education: req.body.education,
     experience: req.body.experience,
     tools: req.body.tools,
-    software: req.body.software,
     languages: req.body.languages,
     frameworks: req.body.frameworks,
     libraries: req.body.libraries,
@@ -46,8 +45,8 @@ router.post("/:id/:position", async (req, res) => {
     });
 });
 
-//Get Total Count of Languages
-router.get("/languages", async (req, res) => {
+//Get Language Count, visualized PieChart
+router.get("/rechart/language_counts", async (req, res) => {
   const langCounts = new Map();
   await Job.find({})
     .then((docs) => {
@@ -64,6 +63,36 @@ router.get("/languages", async (req, res) => {
         }
       });
       res.send(langCounts);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+//Get Job Count, visualized as Treemap
+
+router.get("/recharts/position_counts", async (req, res) => {
+  await Job.find({})
+    .then((docs) => {
+      const jobCounts = new Map();
+      docs.forEach((doc) => {
+        let pos = doc.position;
+        if (jobCounts.has(pos)) {
+          let counter = jobCounts.get(pos);
+          counter++;
+          jobCounts.set(pos, counter);
+        } else {
+          jobCounts.set(pos, 1);
+        }
+      });
+
+      let arr = [];
+
+      jobCounts.forEach((size, name) => {
+        arr.push({ name, size });
+      });
+
+      res.send(JSON.stringify(arr));
     })
     .catch((err) => {
       console.log(err);

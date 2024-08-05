@@ -39,10 +39,6 @@ const schema = {
     type: [String],
     required: false,
   },
-  software: {
-    type: [String],
-    required: false,
-  },
   libaries: {
     type: [String],
     required: false,
