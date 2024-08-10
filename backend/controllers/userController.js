@@ -34,6 +34,24 @@ router.get("/:id", (req, res) => {
     });
 });
 
+//Login Request
+router.get("/users?email=:email&password=:password", (req, res) => {
+  let email = req.params.email;
+  let password = req.params.password;
+
+  if (ev.validate(email) && uv.validPassword(password)) {
+    User.findOne({ email: email, password: password })
+      .then((doc) => {
+        res.send(doc._id);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    return res.status(400).send("Account Not Found");
+  }
+});
+
 //Create A User
 router.post("/", async (req, res) => {
   let { username, password, email } = req.body;
@@ -41,11 +59,7 @@ router.post("/", async (req, res) => {
   if (await User.exists({ email: email })) {
     return res.status(400).send("User Exists.");
   } else {
-    if (
-      ev.validate(email) &&
-      uv.validUsername(username) &&
-      uv.validPassword(password)
-    ) {
+    if (ev.validate(email) && uv.validPassword(password)) {
       let hash = createHmac("sha256", password).update("Encrypt").digest("hex");
       password = hash;
       let u = new User({ username, password, email });
