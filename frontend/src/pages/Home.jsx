@@ -8,6 +8,29 @@ export default class Home extends Component {
     super(props);
     this.state = {
       name: "positions",
+      reviews: [
+        {
+          id: 1,
+          rating: 4.5,
+          user: "John Smith",
+          comment: "Thanks to TechTrends!",
+          link: "google.ca",
+        },
+        {
+          id: 2,
+          rating: 5.0,
+          user: "Alyssa Sanders",
+          comment: "It Helped Me Get a Job!",
+          link: "google.ca",
+        },
+        {
+          id: 3,
+          rating: 4,
+          user: "Sam Doherty",
+          comment: "And Showed Which Skills Are In-Demand!",
+          link: "google.ca",
+        },
+      ],
     };
   }
 
@@ -25,18 +48,18 @@ export default class Home extends Component {
                 </div>
                 <div className="col-12">
                   <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Cras tempus enim sit amet consectetur dignissim. Ut quis
-                    rutrum elit. Donec aliquam ante sed imperdiet lobortis.
-                    Donec feugiat est eget pellentesque congue. Proin dui
-                    mauris, ultricies ac enim id, consectetur consequat nisl.
-                    Morbi quam sem, imperdiet vitae posuere ut, rutrum
-                    consectetur arcu. Maecenas mi orci, luctus id eros quis,
-                    finibus rhoncus odio. Cras massa tortor, ultricies at mattis
-                    in, cursus et mauris. Maecenas mollis iaculis dolor at
-                    dignissim. Vivamus ut libero tempus, ultricies velit
-                    suscipit, pulvinar diam. Mauris ullamcorper magna quis
-                    porttitor fringilla.
+                    A job market analysis app that allows you to track the ebbs
+                    & flows of today's tech career landscape.
+                  </p>
+                  <p>
+                    Track changes in the employable skills for jobs and changes
+                    in desired technologies and view job posts aggregated from
+                    sites like LinkedIn, Indeed & Glassdoor.
+                  </p>
+                  <p>
+                    Also help provide data to improve the site by adding job
+                    posts you've found in your search & help the developer
+                    community stay informed on what to reskill.
                   </p>
                 </div>
               </div>
@@ -58,66 +81,24 @@ export default class Home extends Component {
             </div>
           </div>
           <div className="row">
-            <div className="col-4">
-              <div className="card">
-                <div className="card-body">
-                  <h5 className="card-title">Card title</h5>
-                  <h6 className="card-subtitle mb-2 text-body-secondary">
-                    Card subtitle
-                  </h6>
-                  <p className="card-text">
-                    Some quick example text to build on the card title and make
-                    up the bulk of the card's content.
-                  </p>
-                  <Link to="#" className="card-link">
-                    Card link
-                  </Link>
-                  <Link to="#" className="card-link">
-                    Another link
-                  </Link>
+            {this.state.reviews.map((review) => {
+              return (
+                <div className="col-4">
+                  <div className="card">
+                    <div className="card-body">
+                      <h5 className="card-title">{review.rating}</h5>
+                      <h6 className="card-subtitle mb-2 text-body-secondary">
+                        {review.user}
+                      </h6>
+                      <p className="card-text">{review.comment}</p>
+                      <Link to={review.link} className="card-link">
+                        View Review
+                      </Link>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="col-4">
-              <div className="card">
-                <div className="card-body">
-                  <h5 className="card-title">Card title</h5>
-                  <h6 className="card-subtitle mb-2 text-body-secondary">
-                    Card subtitle
-                  </h6>
-                  <p className="card-text">
-                    Some quick example text to build on the card title and make
-                    up the bulk of the card's content.
-                  </p>
-                  <Link to="#" className="card-link">
-                    Card link
-                  </Link>
-                  <Link to="#" className="card-link">
-                    Another link
-                  </Link>
-                </div>
-              </div>
-            </div>
-            <div className="col-4">
-              <div className="card">
-                <div className="card-body">
-                  <h5 className="card-title">Card title</h5>
-                  <h6 className="card-subtitle mb-2 text-body-secondary">
-                    Card subtitle
-                  </h6>
-                  <p className="card-text">
-                    Some quick example text to build on the card title and make
-                    up the bulk of the card's content.
-                  </p>
-                  <Link to="#" className="card-link">
-                    Card link
-                  </Link>
-                  <Link to="#" className="card-link">
-                    Another link
-                  </Link>
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
       </>

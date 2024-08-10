@@ -1,9 +1,9 @@
-import React, { Component } from "react";
+import { Component } from "react";
 
-export default class Login extends Component {
+export default class Signup extends Component {
   constructor(props) {
     super(props);
-    this.state = { email: "", password: "", message: "" };
+    this.state = { email: "", password: "", confirmPassword: "" };
   }
 
   render() {
@@ -36,40 +36,47 @@ export default class Login extends Component {
                 this.setState({ password: event.target.value });
               }}
             />
+            <i className="bi bi-eye-slash"></i>
           </div>
-          <div className="mb-3 form-check">
-            <input
-              type="checkbox"
-              className="form-check-input"
-              id="exampleCheck1"
-            />
-            <label className="form-check-label" htmlFor="exampleCheck1">
-              Remember Me
+          <div className="mb-3">
+            <label htmlFor="exampleInputPassword1" className="form-label">
+              Confirm Password
             </label>
+            <input
+              type="password"
+              className="form-control"
+              id="exampleInputPassword2"
+              value={this.state.confirmPassword}
+              onChange={(event) => {
+                this.setState({ confirmPassword: event.target.value });
+              }}
+            />
+            <i className="bi bi-eye-slash"></i>
           </div>
+          <p>Captcha Here</p>
           <button
             type="submit"
             className="btn btn-primary m-1"
-            onClick={this.onLoginClick}
+            onClick={this.onSignupClick}
           >
-            Login
+            Sign-up
           </button>
         </form>
       </div>
     );
   }
 
-  onLoginClick = async () => {
+  onSignupClick = async () => {
     console.log(this.state);
     let response = await fetch(
-      `http://localhost:8080/users?email=${this.state.email}&password=${this.state.password}`,
+      `http://localhost:5000/users?email=${this.state.email}&password=${this.state.password}`,
       { method: "GET" }
     );
     let body = await response.json();
 
     console.log(body);
 
-    if (body) {
+    if (body.length > 0) {
       this.setState({
         message: <span className="text-success">Successful Login!</span>,
       });

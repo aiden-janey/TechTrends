@@ -2,6 +2,14 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
 export default class NavBar extends Component {
+  constructor() {
+    super();
+    this.state = {
+      login: "localhost:3000/login",
+      signup: "localhost:3000/signup",
+      home: "localhost:3000/",
+    };
+  }
   render() {
     return (
       <div className="container">
@@ -35,8 +43,8 @@ export default class NavBar extends Component {
               </Link>
               <ul className="dropdown-menu">
                 <li>
-                  <Link className="dropdown-item" to="/jobs/added">
-                    My Jobs
+                  <Link className="dropdown-item" to="/jobs/list">
+                    View Jobs
                   </Link>
                 </li>
                 <li>
@@ -51,7 +59,7 @@ export default class NavBar extends Component {
                 </li>
                 <li>
                   <Link className="dropdown-item" to="/jobs/salary">
-                    Average Salary
+                    Average Salary by Position
                   </Link>
                 </li>
               </ul>
@@ -99,7 +107,6 @@ export default class NavBar extends Component {
               </Link>
             </li>
           </ul>
-
           <div className="col-md-3 text-end">
             <Link to="/login" className="btn btn-outline-primary me-2">
               Login
