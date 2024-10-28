@@ -29,6 +29,10 @@ const schema = new mongoose.Schema({
     type: Number,
     required: false,
   },
+  username: {
+    type: String,
+    required: true,
+  },
 });
 
 const User = mongoose.model("User", schema);

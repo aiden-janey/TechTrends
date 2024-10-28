@@ -57,7 +57,7 @@ router.post("/", async (req, res) => {
   let { username, password, email } = req.body;
 
   if (await User.exists({ email: email })) {
-    return res.status(400).send("User Exists.");
+    return res.status(400).send("Email already in use.");
   } else {
     if (ev.validate(email) && uv.validPassword(password)) {
       let hash = createHmac("sha256", password).update("Encrypt").digest("hex");

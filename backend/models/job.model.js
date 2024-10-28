@@ -1,10 +1,9 @@
 //Schema Definition for Job
 const mongoose = require("mongoose");
-const { ObjectId } = require("mongodb");
 
 const schema = {
-  userId: {
-    type: ObjectId,
+  username: {
+    type: String,
     required: true,
   },
   position: {
