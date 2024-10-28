@@ -67,7 +67,7 @@ export default class NavBar extends Component {
             <li className="nav-item dropdown">
               <Link
                 className="nav-link px-2 dropdown-toggle"
-                to="tech"
+                to="/tech"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
@@ -97,13 +97,35 @@ export default class NavBar extends Component {
               </ul>
             </li>
             <li>
-              <Link to="/about" className="nav-link px-2">
-                About
+              <Link
+                className="nav-link px-2 dropdown-toggle"
+                to="/users"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Users
               </Link>
+              <ul className="dropdown-menu">
+                <li>
+                  <Link className="dropdown-item" to="/users/salary">
+                    User Salaries
+                  </Link>
+                </li>
+                <li>
+                  <Link className="dropdown-item" to="/users/positions">
+                    User Positions
+                  </Link>
+                </li>
+                <li>
+                  <Link className="dropdown-item" to="/users/experience">
+                    User Experience
+                  </Link>
+                </li>
+              </ul>
             </li>
             <li>
-              <Link to="/contact" className="nav-link px-2">
-                Contact
+              <Link to="/about" className="nav-link px-2">
+                About
               </Link>
             </li>
           </ul>

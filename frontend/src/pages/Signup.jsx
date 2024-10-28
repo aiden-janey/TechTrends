@@ -1,4 +1,6 @@
 import { Component } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
 
 export default class Signup extends Component {
   constructor(props) {
@@ -21,6 +23,7 @@ export default class Signup extends Component {
               onChange={(event) => {
                 this.setState({ email: event.target.value });
               }}
+              required
             />
           </div>
           <div className="mb-3">
@@ -35,6 +38,7 @@ export default class Signup extends Component {
               onChange={(event) => {
                 this.setState({ password: event.target.value });
               }}
+              required
             />
             <i className="bi bi-eye-slash"></i>
           </div>
@@ -50,6 +54,7 @@ export default class Signup extends Component {
               onChange={(event) => {
                 this.setState({ confirmPassword: event.target.value });
               }}
+              required
             />
             <i className="bi bi-eye-slash"></i>
           </div>
@@ -57,7 +62,7 @@ export default class Signup extends Component {
           <button
             type="submit"
             className="btn btn-primary m-1"
-            onClick={this.onSignupClick}
+            onClick={this.validateForm}
           >
             Sign-up
           </button>
@@ -68,7 +73,14 @@ export default class Signup extends Component {
 
   onSignupClick = async () => {
     console.log(this.state);
-    let response = await fetch(
+
+    let res = await axios({
+      method: "get",
+      url: "http://localhost:8080/users/",
+    });
+    this.setState({ children: res.data });
+
+    let response = await axios(
       `http://localhost:5000/users?email=${this.state.email}&password=${this.state.password}`,
       { method: "GET" }
     );
@@ -85,5 +97,17 @@ export default class Signup extends Component {
         message: <span className="text-danger">Login Failed.</span>,
       });
     }
+  };
+
+  validateForm = () => {
+    let email = this.state.email;
+    let password = this.state.password;
+    let confirmPassword = this.state.confirmPassword;
+
+    //Check if form has all field populated.
+    if (!email && !password && !confirmPassword)
+      alert("Please Enter Valid Data.");
+
+    //Check for illegal characters in each field.
   };
 }
