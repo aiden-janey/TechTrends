@@ -6,19 +6,7 @@ const ev = require("email-validator");
 const Validation = require("../utils/validation.js");
 const { createHmac } = require("node:crypto");
 const uv = new Validation();
-
-//Get All Users
-router.get("/", (req, res) => {
-  User.find({})
-    .then((docs) => {
-      res.send(docs);
-    })
-    .catch((err) => {
-      console.log(
-        `Error in Retrieving Users: ${JSON.stringify(err, undefined, 2)}`
-      );
-    });
-});
+const db = require("../deploy.js");
 
 //Get A User
 router.get("/:id", (req, res) => {
@@ -34,13 +22,12 @@ router.get("/:id", (req, res) => {
     });
 });
 
-//Login Request
-router.get("/users?email=:email&password=:password", (req, res) => {
-  let email = req.params.email;
-  let password = req.params.password;
+//HTTP GET
+router.get("/login", (req, res) => {
+  let [username, email, passwd] = req.body;
 
-  if (ev.validate(email) && uv.validPassword(password)) {
-    User.findOne({ email: email, password: password })
+  if (ev.validate(email) && uv.validPassword(passwd)) {
+    User.findOne({ email: email, password: passwd })
       .then((doc) => {
         res.send(doc._id);
       })
@@ -52,30 +39,38 @@ router.get("/users?email=:email&password=:password", (req, res) => {
   }
 });
 
-//Create A User
-router.post("/", async (req, res) => {
-  let { username, password, email } = req.body;
-
-  if (await User.exists({ email: email })) {
-    return res.status(400).send("Email already in use.");
-  } else {
-    if (ev.validate(email) && uv.validPassword(password)) {
-      let hash = createHmac("sha256", password).update("Encrypt").digest("hex");
-      password = hash;
-      let u = new User({ username, password, email });
-
-      await u
-        .save()
-        .then((doc) => {
-          res.send(doc);
-          console.log(`Hello ${doc.body.JSON}`);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      return res.status(400).send("Invalid Username, Email or Password.");
+//HTTP POST
+router.post("/signup", (req, res) => {
+  let { username, passwd, email } = req.body;
+  let userId = "test";
+  let userExists = false;
+  //check if user exists
+  db.module.query(
+    `SELECT username, email FROM users WHERE username="${username}" OR email="${email}";`,
+    (err, result, fields) => {
+      if (err) console.log(err);
+      if (result.length >= 1) userExists = true;
     }
+  );
+  if (userExists) {
+    return res.status(400).send("Username and/or Email already in use.");
+  } else {
+    //backend validation
+    if (ev.validate(email) && uv.validPassword(passwd)) {
+      //encrypt password with userId
+      let hash = createHmac("sha256", passwd).update("Encrypt").digest("hex");
+      passwd = hash;
+      console.log(passwd);
+
+      //Insert into db
+      db.module.query(
+        `INSERT INTO users(id, username, email, passwd) VALUES ("${userId}", "${username}", "${email}", "${passwd}");`,
+        (err, result, fields) => {
+          if (err) console.log(err);
+          res.send(result);
+        }
+      );
+    } else return res.status(400).send("Invalid Username, Email or Password.");
   }
 });
 
