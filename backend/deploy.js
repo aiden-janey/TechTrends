@@ -1,8 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const userController = require("./controllers/userController.js");
-const jobController = require("./controllers/jobController.js");
+const userRoute = require("./routes/userRoute.js");
+const jobRoute = require("./routes/jobRoute.js");
 const app = express();
 const mysql = require("mysql2");
 require("dotenv").config();
@@ -25,8 +25,8 @@ db.connect((err) => {
 app.use(cors());
 app.use(express.json());
 
-app.use("/users", userController);
-app.use("/jobs", jobController);
+app.use("/users", userRoute);
+app.use("/jobs", jobRoute);
 
 app.listen(8080, () => console.log("Server Started on Port 8080"));
 

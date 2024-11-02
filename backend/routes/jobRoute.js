@@ -72,32 +72,14 @@ router.get("/rechart/language_counts", async (req, res) => {
 
 //Get Job Count, visualized as Treemap
 
-router.get("/recharts/position_counts", async (req, res) => {
-  await Job.find({})
-    .then((docs) => {
-      const jobCounts = new Map();
-      docs.forEach((doc) => {
-        let pos = doc.position;
-        if (jobCounts.has(pos)) {
-          let counter = jobCounts.get(pos);
-          counter++;
-          jobCounts.set(pos, counter);
-        } else {
-          jobCounts.set(pos, 1);
-        }
-      });
-
-      let arr = [];
-
-      jobCounts.forEach((size, name) => {
-        arr.push({ name, size });
-      });
-
-      res.send(JSON.stringify(arr));
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+router.get("/recharts/position_counts", (req, res) => {
+  db.module.query(
+    "SELECT title AS name, COUNT(title) AS size FROM jobs ORDER BY title;",
+    (err, result, fields) => {
+      if (err) console.log(err);
+      res.send(result);
+    }
+  );
 });
 
 module.exports = router;

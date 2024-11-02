@@ -16,8 +16,8 @@ DROP TABLE IF EXISTS dbs;
 
 CREATE TABLE users(
     id VARCHAR(16),
-    username VARCHAR(16) NOT NULL,
-    passwd VARCHAR(32) NOT NULL,
+    username VARCHAR(16),
+    passwd VARCHAR(64) NOT NULL,
     email VARCHAR(50) NOT NULL,
     salary DECIMAL(8,2),
     age INT,
@@ -36,6 +36,7 @@ CREATE TABLE jobs(
     province VARCHAR(2),
     country VARCHAR(16) NOT NULL,
     link VARCHAR(255) NOT NULL,
+    postDate DATE,
     PRIMARY KEY (id)
 );
 
@@ -310,11 +311,10 @@ INSERT INTO dbs (db) VALUES
 
 --Insert sample data.
 INSERT INTO users(id, username, passwd, email, salary, age, country) VALUES ("admin00", "aiden", "admin123", "aiden@techtrends.ca", 100000.00, 24, "Canada");
+INSERT INTO jobs(title, education, experience, company, addr, city, province, country, link) VALUE 
+("Software Engineer (Early Career)", 3, 0, "Cresta", "100 King Street West 1 First Canadian Place, Suite 6200", "Toronto","ON", "Canada", "https://job-boards.greenhouse.io/cresta/jobs/4251044008?gh_src=9a5432008us");
 INSERT INTO users_positions(userId, positionId) VALUES ("admin00", 3);
 INSERT INTO users_jobs(userId, jobId) VALUES ("admin00", 1);
 INSERT INTO users_levels(userId, levelId) VALUES ("admin00", 1);
-
-INSERT INTO jobs(title, education, experience, company, addr, city, province, country, link) VALUE 
-("Software Engineer (Early Career)", 3, 0, "Cresta", "100 King Street West 1 First Canadian Place, Suite 6200", "Toronto","ON", "Canada", "https://job-boards.greenhouse.io/cresta/jobs/4251044008?gh_src=9a5432008us");
 INSERT INTO jobs_levels(jobId, levelId) VALUES (1, 2);
 INSERT INTO jobs_attendance(jobId, attendanceId) VALUES (1, 2);
