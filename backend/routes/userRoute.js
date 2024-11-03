@@ -6,11 +6,30 @@ const validator = require("../utils/validator.js");
 const generator = require("../utils/generator.js");
 const db = require("../deploy.js");
 
-router.get("/", (req, res) => {
-  db.module.query("SELECT * FROM users;", (err, results, fields) => {
-    if (err) console.log(err);
-    res.send(results);
-  });
+//HTTP GET: Get Specific User Data
+router.get("/:id", (req, res) => {
+  let id = req.params.id;
+
+  //validate id
+  if (validator.validateId(id) == false) res.status(400).send("Invalid Id.");
+  else {
+    //check if userID exists
+    db.module.query(
+      `SELECT COUNT(id) FROM users WHERE id="${id}";`,
+      (err, results, fields) => {
+        if (err) console.log(err);
+        if (results.length == 1) {
+          db.module.query(
+            `SELECT u.username, u.salary, u.age, u.country, p.position, l.lvl FROM users u LEFT JOIN users_positions up ON u.id = up.userId LEFT JOIN positions p ON up.positionId = p.id LEFT JOIN users_levels ul ON u.id = ul.userId LEFT JOIN levels l ON ul.levelId = l.id WHERE u.id = "${id}";`,
+            (err, results, fields) => {
+              if (err) console.log(err);
+              return res.status(200).send(results);
+            }
+          );
+        } else return res.status(400).send("ID Does Not Exist.");
+      }
+    );
+  }
 });
 
 //HTTP GET: Request User ID given Email & Password
@@ -81,118 +100,220 @@ router.patch("/:id/username", (req, res) => {
   let username = req.body.username;
   let id = req.params.id;
 
-  //validate username
-  if (validator.validateUsername(username) == false)
-    res.status(400).send("Invalid Username.");
-
-  //TODO: check if userID exists
-  db.module.query(
-    `SELECT COUNT(id) FROM users WHERE id="${id}";`,
-    (err, results, fields) => {
-      if (err) console.log(err);
-      if (results.length != 1)
-        return res.status(400).send("ID Does Not Exist.");
-      if (results.length == 1) {
-        //update username in DB
-        db.module.query(
-          `UPDATE users SET username="${username}" WHERE id="${id}";`,
-          (err, results) => {
-            if (err) console.log(err);
-            return res.status(200).send("Updated Username.");
-          }
-        );
-      }
+  //validate id
+  if (validator.validateId(id) == false) res.status(400).send("Invalid Id.");
+  else {
+    //validate username
+    if (validator.validateUsername(username) == false)
+      res.status(400).send("Invalid Username.");
+    else {
+      //check if userID exists
+      db.module.query(
+        `SELECT COUNT(id) FROM users WHERE id="${id}";`,
+        (err, results, fields) => {
+          if (err) console.log(err);
+          if (results.length == 1) {
+            //update username in DB
+            db.module.query(
+              `UPDATE users SET username="${username}" WHERE id="${id}";`,
+              (err, results) => {
+                if (err) console.log(err);
+                return res.status(200).send("Updated Username.");
+              }
+            );
+          } else return res.status(400).send("ID Does Not Exist.");
+        }
+      );
     }
-  );
+  }
 });
 
-//Update Salary
-router.put("/:id/salary", async (req, res) => {
-  if (!ObjectId.isValid(req.params.id))
-    return res.status(400).send(`No Record w/ Given Id: ${req.params.id}`);
+//HTTP PATCH: Update Salary
+router.patch("/:id/salary", (req, res) => {
+  let salary = req.body.salary;
+  let id = req.params.id;
 
-  await User.findByIdAndUpdate(req.params.id, req.body)
-    .then((doc) => {
-      doc.salaries.push(req.body.currSalary);
-      res.send(doc);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  //validate id
+  if (validator.validateId(id) == false) res.status(400).send("Invalid Id.");
+  else {
+    //validate salary
+    if (validator.validateSalary(salary) == false) {
+      res.status(400).send("Invalid Salary.");
+      console.log(typeof salary);
+    } else {
+      //check if userID exists
+      db.module.query(
+        `SELECT COUNT(id) FROM users WHERE id="${id}";`,
+        (err, results, fields) => {
+          if (err) console.log(err);
+          if (results.length == 1) {
+            //update salary in DB
+            db.module.query(
+              `UPDATE users SET salary=${salary} WHERE id="${id}";`,
+              (err, results) => {
+                if (err) console.log(err);
+                return res.status(200).send("Updated Salary.");
+              }
+            );
+          } else return res.status(400).send("ID Does Not Exist.");
+        }
+      );
+    }
+  }
 });
 
-//Update Position
-router.put("/:id/position", async (req, res) => {
-  if (!ObjectId.isValid(req.params.id))
-    return res.status(400).send(`No Record w/ Given Id: ${req.params.id}`);
+//HTTP PATCH: Update Age
+router.patch("/:id/age", (req, res) => {
+  let age = req.body.age;
+  let id = req.params.id;
 
-  await User.findByIdAndUpdate(req.params.id, req.body)
-    .then((doc) => {
-      doc.jobs.push(req.body.currJob);
-      res.send(doc);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  //validate id
+  if (validator.validateId(id) == false) res.status(400).send("Invalid Id.");
+  else {
+    //validate username
+    if (validator.validateAge(age) == false)
+      res.status(400).send("Invalid Age.");
+    else {
+      //check if userID exists
+      db.module.query(
+        `SELECT COUNT(id) FROM users WHERE id="${id}";`,
+        (err, results, fields) => {
+          if (err) console.log(err);
+          if (results.length == 1) {
+            //update age in DB
+            db.module.query(
+              `UPDATE users SET age=${age} WHERE id="${id}";`,
+              (err, results) => {
+                if (err) console.log(err);
+                return res.status(200).send("Updated Age.");
+              }
+            );
+          } else return res.status(400).send("ID Does Not Exist.");
+        }
+      );
+    }
+  }
 });
 
-//Update Level
-router.put("/:id/level", async (req, res) => {
-  if (!ObjectId.isValid(req.params.id))
-    return res.status(400).send(`No Record w/ Given Id: ${req.params.id}`);
+//HTTP PATCH: Update Country
+router.patch("/:id/country", (req, res) => {
+  let country = req.body.country;
+  let id = req.params.id;
 
-  await User.findByIdAndUpdate(req.params.id, req.body)
-    .then((doc) => {
-      doc.levels.push(req.body.currLvl);
-      res.send(doc);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  //validate id
+  if (validator.validateId(id) == false) res.status(400).send("Invalid Id.");
+  else {
+    //validate username
+    if (validator.validateCountry(country) == false)
+      res.status(400).send("Invalid country.");
+    else {
+      //check if userID exists
+      db.module.query(
+        `SELECT COUNT(id) FROM users WHERE id="${id}";`,
+        (err, results, fields) => {
+          if (err) console.log(err);
+          if (results.length == 1) {
+            //update username in DB
+            db.module.query(
+              `UPDATE users SET country="${country}" WHERE id="${id}";`,
+              (err, results) => {
+                if (err) console.log(err);
+                return res.status(200).send("Updated country.");
+              }
+            );
+          } else return res.status(400).send("ID Does Not Exist.");
+        }
+      );
+    }
+  }
 });
 
-//Update Age
-router.put("/:id/age", async (req, res) => {
-  if (!ObjectId.isValid(req.params.id))
-    return res.status(400).send(`No Record w/ Given Id: ${req.params.id}`);
+//HTTP PATCH: Update Position
+router.patch("/:id/position", (req, res) => {
+  let position = req.body.position;
+  let id = req.params.id;
 
-  await User.findByIdAndUpdate(req.params.id, req.body)
-    .then((doc) => {
-      doc.city = req.body.city;
-      res.send(doc);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  //validate id
+  if (validator.validateId(id) == false) res.status(400).send("Invalid Id.");
+  else {
+    //validate username
+    if (validator.validatePosition(position) == false)
+      res.status(400).send("Invalid Position.");
+    else {
+      //check if userID exists
+      db.module.query(
+        `SELECT COUNT(id) FROM users WHERE id="${id}";`,
+        (err, results, fields) => {
+          if (err) console.log(err);
+          if (results.length == 1) {
+            //update username in DB
+            db.module.query(
+              `SELECT id FROM positions WHERE position="${position}";`,
+              (err, results, fields) => {
+                if (err) console.log(err);
+                if (results.length == 1) {
+                  let posId = results[0].id;
+                  db.module.query(
+                    `INSERT INTO users_positions (userId, positionId) VALUES ("${id}", "${posId}");`,
+                    (err, results, fields) => {
+                      if (err) console.log(err);
+                      return res.status(200).send("Position Updated.");
+                    }
+                  );
+                } else {
+                  return res.status(400).send("Position Does Not Exists.");
+                }
+              }
+            );
+          } else return res.status(400).send("ID Does Not Exist.");
+        }
+      );
+    }
+  }
 });
 
-//Update Country
-router.put("/:id/country", async (req, res) => {
-  if (!ObjectId.isValid(req.params.id))
-    return res.status(400).send(`No Record w/ Given Id: ${req.params.id}`);
+//HTTP PATCH: Update Level
+router.patch("/:id/level", (req, res) => {
+  let level = req.body.level;
+  let id = req.params.id;
 
-  await User.findByIdAndUpdate(req.params.id, req.body)
-    .then((doc) => {
-      doc.city = req.body.city;
-      res.send(doc);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
-
-//Delete User
-router.delete("/:id", async (req, res) => {
-  if (!ObjectId.isValid(req.params.id))
-    return res.status(400).send(`No Record w/ Given Id: ${req.params.id}`);
-
-  await User.findByIdAndDelete(req.params.id)
-    .then((doc) => {
-      res.send(doc);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  //validate id
+  if (validator.validateId(id) == false) res.status(400).send("Invalid Id.");
+  else {
+    //validate username
+    if (validator.validateLevel(level) == false)
+      res.status(400).send("Invalid Position.");
+    else {
+      //check if userID exists
+      db.module.query(
+        `SELECT COUNT(id) FROM users WHERE id="${id}";`,
+        (err, results, fields) => {
+          if (err) console.log(err);
+          if (results.length == 1) {
+            //update level in DB
+            db.module.query(
+              `SELECT id FROM levels WHERE lvl="${level}";`,
+              (err, results, fields) => {
+                if (err) console.log(err);
+                if (results.length == 1) {
+                  let lvlId = results[0].id;
+                  db.module.query(
+                    `INSERT INTO users_levels (userId, levelId) VALUES ("${id}", "${lvlId}");`,
+                    (err, results, fields) => {
+                      if (err) console.log(err);
+                      return res.status(200).send("Level Updated.");
+                    }
+                  );
+                } else {
+                  return res.status(400).send("Level Does Not Exists.");
+                }
+              }
+            );
+          } else return res.status(400).send("ID Does Not Exist.");
+        }
+      );
+    }
+  }
 });
 
 module.exports = router;
