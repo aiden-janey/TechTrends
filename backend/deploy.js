@@ -1,8 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const userRoute = require("./routes/userRoute.js");
-const jobRoute = require("./routes/jobRoute.js");
+const userRoute = require("./routes/users.route.js");
+const jobRoute = require("./routes/jobs.route.js");
 const app = express();
 const mysql = require("mysql2");
 require("dotenv").config();

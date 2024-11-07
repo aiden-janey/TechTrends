@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../models/user.model.js");
 const { createHmac, randomBytes } = require("node:crypto");
 const {
   validateUsername,
@@ -10,7 +9,7 @@ const {
   validateId,
   validatePassword,
   validateSalary,
-} = require("../utils/validation.js");
+} = require("../utils/validation.util.js");
 const db = require("../deploy.js");
 
 //HTTP GET: Get Specific User Data
