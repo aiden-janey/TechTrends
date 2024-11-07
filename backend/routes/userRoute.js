@@ -1,318 +1,234 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user.model.js");
-const { createHmac } = require("node:crypto");
-const validator = require("../utils/validator.js");
-const generator = require("../utils/generator.js");
+const { createHmac, randomBytes } = require("node:crypto");
+const {
+  validateUsername,
+  validateInteger,
+  validateCountry,
+  validateEmail,
+  validateId,
+  validatePassword,
+  validateSalary,
+} = require("../utils/validation.js");
 const db = require("../deploy.js");
 
 //HTTP GET: Get Specific User Data
-router.get("/:id", (req, res) => {
-  let id = req.params.id;
+router.get("/data", (req, res) => {
+  let id = req.body.id;
+  let query =
+    "SELECT u.username, u.salary, u.age, u.country, p.position, l.lvl FROM users u LEFT JOIN users_positions up ON u.id = up.userId" +
+    " LEFT JOIN positions p ON up.positionId = p.id LEFT JOIN users_levels ul ON u.id = ul.userId LEFT JOIN levels l ON ul.levelId = l.id WHERE u.id = ?;";
 
-  //validate id
-  if (validator.validateId(id) == false) res.status(400).send("Invalid Id.");
-  else {
-    //check if userID exists
-    db.module.query(
-      `SELECT COUNT(id) FROM users WHERE id="${id}";`,
-      (err, results, fields) => {
-        if (err) console.log(err);
-        if (results.length == 1) {
-          db.module.query(
-            `SELECT u.username, u.salary, u.age, u.country, p.position, l.lvl FROM users u LEFT JOIN users_positions up ON u.id = up.userId LEFT JOIN positions p ON up.positionId = p.id LEFT JOIN users_levels ul ON u.id = ul.userId LEFT JOIN levels l ON ul.levelId = l.id WHERE u.id = "${id}";`,
-            (err, results, fields) => {
-              if (err) console.log(err);
-              return res.status(200).send(results);
-            }
-          );
-        } else return res.status(400).send("ID Does Not Exist.");
+  if (validateId(id)) {
+    db.module.query(query, [id], (err, rows) => {
+      if (err) {
+        return res.status(500).send(`DB Error: ${err}`);
+      } else if (rows.length == 0) {
+        return res.status(400).send("User Not Found.");
+      } else {
+        return res.status(200).send(rows[0]);
       }
-    );
+    });
+  } else {
+    res.status(400).send("Invalid Id.");
   }
 });
 
 //HTTP GET: Request User ID given Email & Password
 router.get("/login", (req, res) => {
   let { passwd, email } = req.body;
-  let isValid =
-    validator.validateEmail(email) && validator.validatePassword(passwd);
+  let query = "SELECT id FROM users WHERE email=? AND passwd=?;";
 
-  //validate user input
-  if (!isValid) {
+  if (validateEmail(email) && validatePassword(passwd)) {
+    //encrypt password
+    let encryptedPasswd = createHmac("sha256", passwd)
+      .update("Encrypt")
+      .digest("hex");
+
+    //find if user exists & return user id
+    db.module.execute(query, [email, encryptedPasswd], (err, rows) => {
+      if (err) {
+        return res.status(500).send(`DB Error: ${err}`);
+      } else if (rows.length == 1) {
+        return res.status(200).send(rows[0]);
+      } else {
+        return res.status(400).send("Incorrect Email or Password.");
+      }
+    });
+  } else {
     return res.status(400).send("Invalid Email or Password.");
   }
-
-  //encrypt password
-  let hash = createHmac("sha256", passwd).update("Encrypt").digest("hex");
-  passwd = hash;
-
-  //find if user exists & return user id
-  db.module.query(
-    `SELECT id FROM users WHERE email="${email}" AND passwd="${passwd}";`,
-    (err, results, fields) => {
-      if (err) console.log(err);
-      if (results.length == 1) return res.status(200).send(results);
-    }
-  );
 });
 
 //HTTP POST: Send Email & Password & Create New User
 router.post("/signup", (req, res) => {
   let { passwd, email } = req.body;
-  let isValid =
-    validator.validateEmail(email) && validator.validatePassword(passwd);
+  let query = "SELECT COUNT(email) AS count FROM users WHERE email=?;";
+  let insert = "INSERT INTO users(id, email, passwd) VALUES (?, ?, ?);";
 
-  //validate user input
-  if (!isValid) {
-    return res.status(400).send("Invalid Email or Password.");
+  if (validateEmail(email) && validatePassword(passwd)) {
+    //check if user exists
+    db.module.execute(query, [email], (err, rows) => {
+      if (err) {
+        return res.status(500).send(`DB Error: ${err}`);
+      } else if (rows[0].count == 1) {
+        return res.status(400).send("Email in Use.");
+      } else {
+        //encrypt password
+        let encryptedPasswd = createHmac("sha256", passwd)
+          .update("Encrypt")
+          .digest("hex");
+
+        //Insert newUser into DB
+        db.module.execute(
+          insert,
+          [randomBytes(3 * 4).toString("base64"), email, encryptedPasswd],
+          (err, rows) => {
+            if (err) {
+              return res.status(500).send(`DB Error: ${err}`);
+            }
+            return res.status(200).send("User Created.");
+          }
+        );
+      }
+    });
+  } else {
+    return res.status(400).send("Invalid Email/Password.");
   }
-
-  //check if user exists
-  db.module.query(
-    `SELECT COUNT(email) FROM users WHERE email="${email}";`,
-    (err, results, fields) => {
-      if (err) console.log(err);
-      if (results.length == 1)
-        return res.status(400).send("Account already Exists.");
-    }
-  );
-
-  //encrypt password
-  let hash = createHmac("sha256", passwd).update("Encrypt").digest("hex");
-  passwd = hash;
-
-  //generate userId
-  let userId = generator.generateUserId();
-
-  //Insert newUser into DB
-  db.module.query(
-    `INSERT INTO users(id, email, passwd) VALUES ("${userId}", "${email}", "${passwd}");`,
-    (err, results, fields) => {
-      if (err) console.log(err);
-      return res.status(200).send(results);
-    }
-  );
 });
 
 //HTTP PATCH: Update Username
-router.patch("/:id/username", (req, res) => {
+router.patch("/data/username", (req, res) => {
   let username = req.body.username;
-  let id = req.params.id;
+  let id = req.body.id;
+  let update = "UPDATE users SET username=? WHERE id=?;";
 
-  //validate id
-  if (validator.validateId(id) == false) res.status(400).send("Invalid Id.");
-  else {
-    //validate username
-    if (validator.validateUsername(username) == false)
-      res.status(400).send("Invalid Username.");
-    else {
-      //check if userID exists
-      db.module.query(
-        `SELECT COUNT(id) FROM users WHERE id="${id}";`,
-        (err, results, fields) => {
-          if (err) console.log(err);
-          if (results.length == 1) {
-            //update username in DB
-            db.module.query(
-              `UPDATE users SET username="${username}" WHERE id="${id}";`,
-              (err, results) => {
-                if (err) console.log(err);
-                return res.status(200).send("Updated Username.");
-              }
-            );
-          } else return res.status(400).send("ID Does Not Exist.");
-        }
-      );
-    }
+  if (validateId(id) && validateUsername(username)) {
+    //check if userID exists
+    db.module.execute(update, [username, id], (err, results) => {
+      if (err) {
+        return res.status(500).send(`DB Error: ${err}`);
+      } else if (results.affectedRows == 1) {
+        return res.status(200).send("Updated Username.");
+      } else {
+        return res.status(400).send("User Not Found.");
+      }
+    });
+  } else {
+    res.status(400).send("Invalid Username/ID.");
   }
 });
 
 //HTTP PATCH: Update Salary
-router.patch("/:id/salary", (req, res) => {
+router.patch("/data/salary", (req, res) => {
   let salary = req.body.salary;
-  let id = req.params.id;
+  let id = req.body.id;
+  let update = "UPDATE users SET salary=? WHERE id=?;";
 
-  //validate id
-  if (validator.validateId(id) == false) res.status(400).send("Invalid Id.");
-  else {
-    //validate salary
-    if (validator.validateSalary(salary) == false) {
-      res.status(400).send("Invalid Salary.");
-      console.log(typeof salary);
-    } else {
-      //check if userID exists
-      db.module.query(
-        `SELECT COUNT(id) FROM users WHERE id="${id}";`,
-        (err, results, fields) => {
-          if (err) console.log(err);
-          if (results.length == 1) {
-            //update salary in DB
-            db.module.query(
-              `UPDATE users SET salary=${salary} WHERE id="${id}";`,
-              (err, results) => {
-                if (err) console.log(err);
-                return res.status(200).send("Updated Salary.");
-              }
-            );
-          } else return res.status(400).send("ID Does Not Exist.");
-        }
-      );
-    }
+  if (validateId(id) && validateSalary(salary)) {
+    //check if userID exists
+    db.module.execute(update, [salary, id], (err, results) => {
+      if (err) {
+        return res.status(500).send(`DB Error: ${err}`);
+      } else if (results.affectedRows == 1) {
+        return res.status(200).send("Updated Salary.");
+      } else {
+        return res.status(400).send("User Not Found.");
+      }
+    });
+  } else {
+    res.status(400).send("Invalid Salary/ID.");
   }
 });
 
 //HTTP PATCH: Update Age
-router.patch("/:id/age", (req, res) => {
+router.patch("/data/age", (req, res) => {
   let age = req.body.age;
-  let id = req.params.id;
+  let id = req.body.id;
+  let update = "UPDATE users SET age=? WHERE id=?;";
 
-  //validate id
-  if (validator.validateId(id) == false) res.status(400).send("Invalid Id.");
-  else {
-    //validate username
-    if (validator.validateAge(age) == false)
-      res.status(400).send("Invalid Age.");
-    else {
-      //check if userID exists
-      db.module.query(
-        `SELECT COUNT(id) FROM users WHERE id="${id}";`,
-        (err, results, fields) => {
-          if (err) console.log(err);
-          if (results.length == 1) {
-            //update age in DB
-            db.module.query(
-              `UPDATE users SET age=${age} WHERE id="${id}";`,
-              (err, results) => {
-                if (err) console.log(err);
-                return res.status(200).send("Updated Age.");
-              }
-            );
-          } else return res.status(400).send("ID Does Not Exist.");
-        }
-      );
-    }
+  if (validateId(id) && validateInteger(age)) {
+    //check if userID exists
+    db.module.execute(update, [age, id], (err, results) => {
+      if (err) {
+        return res.status(500).send(`DB Error: ${err}`);
+      } else if (results.affectedRows == 1) {
+        return res.status(200).send("Updated Age.");
+      } else {
+        return res.status(400).send("User Not Found.");
+      }
+    });
+  } else {
+    res.status(400).send("Invalid Age/ID.");
   }
 });
 
 //HTTP PATCH: Update Country
-router.patch("/:id/country", (req, res) => {
+router.patch("/data/country", (req, res) => {
   let country = req.body.country;
-  let id = req.params.id;
+  let id = req.body.id;
 
-  //validate id
-  if (validator.validateId(id) == false) res.status(400).send("Invalid Id.");
-  else {
-    //validate username
-    if (validator.validateCountry(country) == false)
-      res.status(400).send("Invalid country.");
-    else {
-      //check if userID exists
-      db.module.query(
-        `SELECT COUNT(id) FROM users WHERE id="${id}";`,
-        (err, results, fields) => {
-          if (err) console.log(err);
-          if (results.length == 1) {
-            //update username in DB
-            db.module.query(
-              `UPDATE users SET country="${country}" WHERE id="${id}";`,
-              (err, results) => {
-                if (err) console.log(err);
-                return res.status(200).send("Updated country.");
-              }
-            );
-          } else return res.status(400).send("ID Does Not Exist.");
-        }
-      );
-    }
+  let update = "UPDATE users SET country=? WHERE id=?;";
+
+  if (validateId(id) && validateCountry(country)) {
+    //check if userID exists
+    db.module.execute(update, [country, id], (err, results) => {
+      if (err) {
+        return res.status(500).send(`DB Error: ${err}`);
+      } else if (results.affectedRows == 1) {
+        return res.status(200).send("Updated Country.");
+      } else {
+        return res.status(400).send("User Not Found.");
+      }
+    });
+  } else {
+    res.status(400).send("Invalid Country/ID.");
   }
 });
 
 //HTTP PATCH: Update Position
-router.patch("/:id/position", (req, res) => {
-  let position = req.body.position;
-  let id = req.params.id;
+router.patch("/data/position", (req, res) => {
+  let userId = req.body.userId;
+  let posId = req.body.posId;
+  let insert =
+    "INSERT INTO users_positions (userId, positionId) VALUES (?, ?);";
 
-  //validate id
-  if (validator.validateId(id) == false) res.status(400).send("Invalid Id.");
-  else {
-    //validate username
-    if (validator.validatePosition(position) == false)
-      res.status(400).send("Invalid Position.");
-    else {
-      //check if userID exists
-      db.module.query(
-        `SELECT COUNT(id) FROM users WHERE id="${id}";`,
-        (err, results, fields) => {
-          if (err) console.log(err);
-          if (results.length == 1) {
-            //update username in DB
-            db.module.query(
-              `SELECT id FROM positions WHERE position="${position}";`,
-              (err, results, fields) => {
-                if (err) console.log(err);
-                if (results.length == 1) {
-                  let posId = results[0].id;
-                  db.module.query(
-                    `INSERT INTO users_positions (userId, positionId) VALUES ("${id}", "${posId}");`,
-                    (err, results, fields) => {
-                      if (err) console.log(err);
-                      return res.status(200).send("Position Updated.");
-                    }
-                  );
-                } else {
-                  return res.status(400).send("Position Does Not Exists.");
-                }
-              }
-            );
-          } else return res.status(400).send("ID Does Not Exist.");
-        }
-      );
-    }
+  if (validateId(userId) && validateInteger(posId)) {
+    //check if userID exists
+    db.module.execute(insert, [userId, posId], (err, results) => {
+      if (err) {
+        return res.status(500).send(`DB Error: ${err}`);
+      } else if (results.affectedRows == 1) {
+        return res.status(200).send("Updated Position.");
+      } else {
+        return res.status(400).send("User Not Found.");
+      }
+    });
+  } else {
+    res.status(400).send("Invalid Position/ID.");
   }
 });
 
 //HTTP PATCH: Update Level
-router.patch("/:id/level", (req, res) => {
-  let level = req.body.level;
-  let id = req.params.id;
+router.patch("/data/level", (req, res) => {
+  let userId = req.body.userId;
+  let lvlId = req.body.lvlId;
+  let insert = "INSERT INTO users_levels (userId, levelId) VALUES (?, ?);";
 
-  //validate id
-  if (validator.validateId(id) == false) res.status(400).send("Invalid Id.");
-  else {
-    //validate username
-    if (validator.validateLevel(level) == false)
-      res.status(400).send("Invalid Position.");
-    else {
-      //check if userID exists
-      db.module.query(
-        `SELECT COUNT(id) FROM users WHERE id="${id}";`,
-        (err, results, fields) => {
-          if (err) console.log(err);
-          if (results.length == 1) {
-            //update level in DB
-            db.module.query(
-              `SELECT id FROM levels WHERE lvl="${level}";`,
-              (err, results, fields) => {
-                if (err) console.log(err);
-                if (results.length == 1) {
-                  let lvlId = results[0].id;
-                  db.module.query(
-                    `INSERT INTO users_levels (userId, levelId) VALUES ("${id}", "${lvlId}");`,
-                    (err, results, fields) => {
-                      if (err) console.log(err);
-                      return res.status(200).send("Level Updated.");
-                    }
-                  );
-                } else {
-                  return res.status(400).send("Level Does Not Exists.");
-                }
-              }
-            );
-          } else return res.status(400).send("ID Does Not Exist.");
-        }
-      );
-    }
+  if (validateId(userId) && validateInteger(lvlId)) {
+    //check if userID exists
+    db.module.execute(insert, [userId, lvlId], (err, results) => {
+      if (err) {
+        return res.status(500).send(`DB Error: ${err}`);
+      } else if (results.affectedRows == 1) {
+        return res.status(200).send("Updated Level.");
+      } else {
+        return res.status(400).send("User Not Found.");
+      }
+    });
+  } else {
+    res.status(400).send("Invalid Level/ID.");
   }
 });
 
