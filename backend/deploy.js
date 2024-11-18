@@ -14,6 +14,8 @@ const db = mysql.createConnection({
   database: process.env.DBNAME,
 });
 
+const port = process.env.PORT;
+
 db.connect((err) => {
   if (err)
     console.log(
@@ -28,6 +30,6 @@ app.use(express.json());
 app.use("/users", userRoute);
 app.use("/jobs", jobRoute);
 
-app.listen(8080, () => console.log("Server Started on Port 8080"));
+app.listen(port, () => console.log(`Server Started On ${port}.`));
 
 exports.module = db;
