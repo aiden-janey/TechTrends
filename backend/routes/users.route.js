@@ -3,7 +3,7 @@ const router = express.Router();
 const { createHmac, randomBytes } = require("node:crypto");
 const {
   validateUsername,
-  validateInteger,
+  validateNumber,
   validateCountry,
   validateEmail,
   validateId,
@@ -22,7 +22,7 @@ router.get("/data", (req, res) => {
   if (validateId(id)) {
     db.module.query(query, [id], (err, rows) => {
       if (err) {
-        return res.status(500).send(`DB Error: ${err}`);
+        return res.status(500).send(`DB  ${err}`);
       } else if (rows.length == 0) {
         return res.status(400).send("User Not Found.");
       } else {
@@ -48,7 +48,7 @@ router.get("/login", (req, res) => {
     //find if user exists & return user id
     db.module.execute(query, [email, encryptedPasswd], (err, rows) => {
       if (err) {
-        return res.status(500).send(`DB Error: ${err}`);
+        return res.status(500).send(`DB  ${err}`);
       } else if (rows.length == 1) {
         return res.status(200).send(rows[0]);
       } else {
@@ -70,7 +70,7 @@ router.post("/signup", (req, res) => {
     //check if user exists
     db.module.execute(query, [email], (err, rows) => {
       if (err) {
-        return res.status(500).send(`DB Error: ${err}`);
+        return res.status(500).send(`DB  ${err}`);
       } else if (rows[0].count == 1) {
         return res.status(400).send("Email in Use.");
       } else {
@@ -85,7 +85,7 @@ router.post("/signup", (req, res) => {
           [randomBytes(3 * 4).toString("base64"), email, encryptedPasswd],
           (err, rows) => {
             if (err) {
-              return res.status(500).send(`DB Error: ${err}`);
+              return res.status(500).send(`DB  ${err}`);
             }
             return res.status(200).send("User Created.");
           }
@@ -107,7 +107,7 @@ router.patch("/data/username", (req, res) => {
     //check if userID exists
     db.module.execute(update, [username, id], (err, results) => {
       if (err) {
-        return res.status(500).send(`DB Error: ${err}`);
+        return res.status(500).send(`DB  ${err}`);
       } else if (results.affectedRows == 1) {
         return res.status(200).send("Updated Username.");
       } else {
@@ -129,7 +129,7 @@ router.patch("/data/salary", (req, res) => {
     //check if userID exists
     db.module.execute(update, [salary, id], (err, results) => {
       if (err) {
-        return res.status(500).send(`DB Error: ${err}`);
+        return res.status(500).send(`DB  ${err}`);
       } else if (results.affectedRows == 1) {
         return res.status(200).send("Updated Salary.");
       } else {
@@ -147,11 +147,11 @@ router.patch("/data/age", (req, res) => {
   let id = req.body.id;
   let update = "UPDATE users SET age=? WHERE id=?;";
 
-  if (validateId(id) && validateInteger(age)) {
+  if (validateId(id) && validateNumber(age)) {
     //check if userID exists
     db.module.execute(update, [age, id], (err, results) => {
       if (err) {
-        return res.status(500).send(`DB Error: ${err}`);
+        return res.status(500).send(`DB  ${err}`);
       } else if (results.affectedRows == 1) {
         return res.status(200).send("Updated Age.");
       } else {
@@ -174,7 +174,7 @@ router.patch("/data/country", (req, res) => {
     //check if userID exists
     db.module.execute(update, [country, id], (err, results) => {
       if (err) {
-        return res.status(500).send(`DB Error: ${err}`);
+        return res.status(500).send(`DB  ${err}`);
       } else if (results.affectedRows == 1) {
         return res.status(200).send("Updated Country.");
       } else {
@@ -190,14 +190,15 @@ router.patch("/data/country", (req, res) => {
 router.patch("/data/position", (req, res) => {
   let userId = req.body.userId;
   let posId = req.body.posId;
+  //TODO: either remove primary key or make it update instead
   let insert =
     "INSERT INTO users_positions (userId, positionId) VALUES (?, ?);";
 
-  if (validateId(userId) && validateInteger(posId)) {
+  if (validateId(userId) && validateNumber(posId)) {
     //check if userID exists
     db.module.execute(insert, [userId, posId], (err, results) => {
       if (err) {
-        return res.status(500).send(`DB Error: ${err}`);
+        return res.status(500).send(`DB  ${err}`);
       } else if (results.affectedRows == 1) {
         return res.status(200).send("Updated Position.");
       } else {
@@ -213,13 +214,14 @@ router.patch("/data/position", (req, res) => {
 router.patch("/data/level", (req, res) => {
   let userId = req.body.userId;
   let lvlId = req.body.lvlId;
+  //TODO: either remove primary key or make it update instead
   let insert = "INSERT INTO users_levels (userId, levelId) VALUES (?, ?);";
 
-  if (validateId(userId) && validateInteger(lvlId)) {
+  if (validateId(userId) && validateNumber(lvlId)) {
     //check if userID exists
     db.module.execute(insert, [userId, lvlId], (err, results) => {
       if (err) {
-        return res.status(500).send(`DB Error: ${err}`);
+        return res.status(500).send(`DB  ${err}`);
       } else if (results.affectedRows == 1) {
         return res.status(200).send("Updated Level.");
       } else {

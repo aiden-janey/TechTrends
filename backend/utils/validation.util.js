@@ -1,5 +1,5 @@
 const validateUsername = (username) => {
-  let re = new RegExp("^[A-Za-z][A-Za-z0-9_]{7,19}$");
+  let re = new RegExp("^[A-Za-z][A-Za-z0-9_]{3,16}$");
   return re.test(username);
 };
 const validateEmail = (email) => {
@@ -18,13 +18,47 @@ const validateSalary = (salary) => {
   let re = new RegExp("^[0-9]{0,18}(.[0-9]{1,2})?$");
   return re.test(salary);
 };
-const validateInteger = (age) => {
+//validate any integer number between 0 & 120.
+const validateNumber = (num) => {
   let re = new RegExp("^(?:[1-9]?[0-9]|1[01][0-9]|120)$");
-  return re.test(age);
+  return re.test(num);
 };
+//validate country & city
 const validateCountry = (country) => {
-  let re = new RegExp("^[A-Za-z]+([ -][A-Za-z]+)*$");
+  let re = new RegExp("^[A-Za-z]+([ -][A-Za-z]+)*{1,16}$");
   return re.test(country);
+};
+const validateProvinceCode = (provinceCode) => {
+  let re = new RegExp("^[A-Za-z]{0,2}$");
+  return re.test(provinceCode);
+};
+const validateLink = (link) => {
+  let re = new RegExp(
+    "^(https?://)?(www.)?(linkedin.com|indeed.com|glassdoor.com)/.+$"
+  );
+  return re.test(link);
+};
+const validateDate = (date) => {
+  let re = new RegExp("^(0[1-9]|1[0-2])/([0-2][1-9]|3[01])/d{4}$");
+  return re.test(date);
+};
+const validateTitle = (title) => {
+  let re = new RegExp("^[A-Za-z]+([ -][A-Za-z]+)*{3,32}$");
+  return re.test(title);
+};
+const validateCompany = (company) => {
+  let re = new RegExp("^[A-Za-z0-9]+([ -][A-Za-z0-9]+)*{2,32}$");
+  return re.test(company);
+};
+const validateAddress = (addr) => {
+  let re = new RegExp(
+    "^d+s[A-Za-z0-9s.,'-]+(?:s(?:Apt|Suite|Unit|#)?s?[A-Za-z0-9]*)?{1,255$"
+  );
+  return re.test(addr);
+};
+const validateCity = (city) => {
+  let re = new RegExp("^[A-Za-z]+([ -][A-Za-z]+)*{1,16}$");
+  return re.test(city);
 };
 
 module.exports = {
@@ -33,6 +67,13 @@ module.exports = {
   validatePassword,
   validateId,
   validateSalary,
-  validateInteger,
+  validateNumber,
   validateCountry,
+  validateTitle,
+  validateCompany,
+  validateAddress,
+  validateCity,
+  validateProvinceCode,
+  validateLink,
+  validateDate,
 };
