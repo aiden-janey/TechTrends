@@ -7,12 +7,12 @@ TechTrends provides valuable job market insights for anyone who wants to break i
 
 ## Design Document
 
-[Here](https://docs.google.com/document/d/15L5KICbHbFU1qGPBAO1BYQk_PcdJYwBcb2284nwdfJ4/edit?usp=sharing) is a design document for the TechTrends app. It shows how the app was conceptualized, designed and developed. It contains a list of technologies used, diagrams, wireframes and notes.
+[Here]() is a design document for the TechTrends app. It shows how the app was conceptualized, designed and developed. It contains a list of technologies used, diagrams, wireframes and notes.
 
 **Please note that the following will be treated as a living document. It will be modified as the scope, development and life of this app changes.**
 
 ## Download
 
-You can download a containerized version of the app from DockerHub [here](https://hub.docker.com/u/aidenjaney).
+You can download a containerized version of the app from DockerHub [here]().
 
 **Since the app is currently in development, it is not available for download.**
